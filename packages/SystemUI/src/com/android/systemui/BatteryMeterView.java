@@ -211,7 +211,8 @@ public class BatteryMeterView extends LinearLayout implements
     }
 
     private boolean isCircleBattery() {
-        return  mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_CIRCLE;
+        return  mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_CIRCLE
+                 || mStyle == BatteryMeterDrawableBase.BATTERY_STYLE_DOTTED_CIRCLE;
     }
 
     private boolean isRightClock() {
