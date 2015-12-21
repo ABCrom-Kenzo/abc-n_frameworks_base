@@ -42,4 +42,9 @@
 
     <!-- Vendor mismatched fingerprint warning [CHAR LIMIT=NONE] -->
     <string name="system_error_vendorprint">Кажется, образ заводской прошивки устарел. Пожалуйста, установите последний образ заводской прошивки на ваше устройство.</string>
+  
+    <!-- Title of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permlab_fakePackageSignature">Разрешить подмену подписи</string>
+    <!-- Description of an application permission, listed so the user can choose whether they want to allow the application to do this. -->
+    <string name="permdesc_fakePackageSignature">Разрешать приложениям обходить систему безопасности, выдавая себя за другое приложение. Вредоносные приложения могут использовать это для доступа к частным данным. Предоставляйте это разрешение на свой страх и риск!</string>
 </resources>
