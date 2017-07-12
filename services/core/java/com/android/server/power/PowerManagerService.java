@@ -1845,7 +1845,7 @@ public final class PowerManagerService extends SystemService
     private void updateUserActivitySummaryLocked(long now, int dirty) {
         // Update the status of the user activity timeout timer.
         if ((dirty & (DIRTY_WAKE_LOCKS | DIRTY_USER_ACTIVITY
-                | DIRTY_WAKEFULNESS | DIRTY_SETTINGS)) != 0) {
+                | DIRTY_WAKEFULNESS | DIRTY_SETTINGS | DIRTY_ACTUAL_DISPLAY_POWER_STATE_UPDATED)) != 0) {
             mHandler.removeMessages(MSG_USER_ACTIVITY_TIMEOUT);
 
             long nextTimeout = 0;
