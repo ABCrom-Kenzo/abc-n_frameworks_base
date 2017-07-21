@@ -5709,6 +5709,7 @@ public final class Settings {
 
         /**
          * Scaling value for smartbar custom button icon
+         * @hide
          */
         public static final String SMARTBAR_CUSTOM_ICON_SIZE = "smartbar_custom_icon_size";
 
