@@ -3957,9 +3957,21 @@ public final class Settings {
 
         /**
          * Custom brightness value for Ambient Display
-         * @hide
+		 * @hide
          */
         public static final String AMBIENT_DOZE_CUSTOM_BRIGHTNESS = "ambient_doze_custom_brightness";
+
+        /**
+         * show clear all recents button
+         * @hide
+         */
+        public static final String SHOW_CLEAR_ALL_RECENTS = "show_clear_all_recents";
+
+        /**
+         * location of the clear all rectents button
+         * @hide
+         */
+        public static final String  RECENTS_CLEAR_ALL_LOCATION = "recents_clear_all_location";
 
         /**
          * Use latest screen-on brightness value for Ambient Display
