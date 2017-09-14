@@ -62,7 +62,7 @@ public class BatteryMeterDrawable extends Drawable implements
     public static final int BATTERY_STYLE_HIDDEN    = 4;
     public static final int BATTERY_STYLE_LANDSCAPE = 5;
     public static final int BATTERY_STYLE_TEXT      = 6;
-    public static final int BATTERY_STYLE_BIGCIRCLE    = 7;
+    public static final int BATTERY_STYLE_SOLID     = 7;
 
     private final int[] mColors;
     private final int mIntrinsicWidth;
@@ -311,7 +311,7 @@ public class BatteryMeterDrawable extends Drawable implements
                     return getBoltColor();
                 }
             //no powersave and pct<15 and style circle
-            } else if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_BIGCIRCLE) {
+            } else if (mStyle == BATTERY_STYLE_CIRCLE) {
                 if (!mPluggedIn) {
                     return mTileLowLevelColor; //red
                 } else {
@@ -493,10 +493,10 @@ public class BatteryMeterDrawable extends Drawable implements
                 return R.drawable.ic_battery_landscape;
             case BATTERY_STYLE_CIRCLE:
                 return R.drawable.ic_battery_circle;
-            case BATTERY_STYLE_BIGCIRCLE:
-                return R.drawable.ic_battery_bigcircle;
             case BATTERY_STYLE_PORTRAIT:
                 return R.drawable.ic_battery_portrait;
+	    case BATTERY_STYLE_SOLID:
+		return R.drawable.ic_battery_solid;
             default:
                 return 0;
         }
@@ -507,10 +507,11 @@ public class BatteryMeterDrawable extends Drawable implements
             case BATTERY_STYLE_LANDSCAPE:
                 return R.style.BatteryMeterViewDrawable_Landscape;
             case BATTERY_STYLE_CIRCLE:
-            case BATTERY_STYLE_BIGCIRCLE:
                 return R.style.BatteryMeterViewDrawable_Circle;
             case BATTERY_STYLE_PORTRAIT:
                 return R.style.BatteryMeterViewDrawable_Portrait;
+	    case BATTERY_STYLE_SOLID:
+		return R.style.BatteryMeterViewDrawable_Solid;
             default:
                 return R.style.BatteryMeterViewDrawable;
         }
@@ -518,13 +519,13 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private int getBoltColor() {
         if (mIsBatteryTile) {
-            if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_BIGCIRCLE) {
+            if (mStyle == BATTERY_STYLE_CIRCLE) {
                 return mContext.getResources().getColor(R.color.batterymeter_circle_tile_bolt_plus_color);
             }
             return (isPctToBeWhiteOrRed ? Color.WHITE : mContext.getResources().getColor(R.color.batterymeter_tile_bolt_plus_color));
         }
         //statusbar battery
-        if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_BIGCIRCLE) {
+        if (mStyle == BATTERY_STYLE_CIRCLE) {
             return mIconTint; //same color of the circle level
         }
         return (isPctToBeWhiteOrRed ? mIconTint : mContext.getResources().getColor(R.color.batterymeter_bolt_color));
@@ -532,13 +533,13 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private int getPlusColor() {
         if (mIsBatteryTile) {
-            if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_BIGCIRCLE) {
+            if (mStyle == BATTERY_STYLE_CIRCLE) {
                 return mContext.getResources().getColor(R.color.batterymeter_circle_tile_bolt_plus_color);
             }
             return (isPctToBeWhiteOrRed ? Color.WHITE : mContext.getResources().getColor(R.color.batterymeter_tile_bolt_plus_color));
         }
 
-        if (mStyle == BATTERY_STYLE_CIRCLE || mStyle == BATTERY_STYLE_BIGCIRCLE) {
+        if (mStyle == BATTERY_STYLE_CIRCLE) {
             return mIconTint;
         }
         return (isPctToBeWhiteOrRed ? mIconTint : mContext.getResources().getColor(R.color.batterymeter_bolt_color));
@@ -559,9 +560,6 @@ public class BatteryMeterDrawable extends Drawable implements
                 break;
             case BATTERY_STYLE_LANDSCAPE:
                 textSize = widthDiv2 * 1.0f;
-                break;
-            case BATTERY_STYLE_BIGCIRCLE:
-                textSize = widthDiv2 * 1.2f;
                 break;
             default:
                 textSize = widthDiv2 * 0.9f;
@@ -672,10 +670,10 @@ public class BatteryMeterDrawable extends Drawable implements
 
     private void updatePortDuffMode() {
         final int level = mLevel;
-        if (level > mColors[0] /*15*/ && level <31 && mStyle != BATTERY_STYLE_CIRCLE && mStyle != BATTERY_STYLE_BIGCIRCLE) {
+        if (level > mColors[0] /*15*/ && level <31 && mStyle != BATTERY_STYLE_CIRCLE) {
             mTextAndBoltPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.OVERLAY));
             mTextAndBoltPaint.setColor(mIsBatteryTile ? Color.WHITE : mIconTint); //mIconTint so when darkintensity enabled the pct is dark and more visible
-        } else if (level <= mColors[0] /*15*/ && mStyle != BATTERY_STYLE_CIRCLE && mStyle != BATTERY_STYLE_BIGCIRCLE){
+        } else if (level <= mColors[0] /*15*/ && mStyle != BATTERY_STYLE_CIRCLE){
             mTextAndBoltPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.OVERLAY));
             mTextAndBoltPaint.setColor(getColorForLevel(level));
         } else {
