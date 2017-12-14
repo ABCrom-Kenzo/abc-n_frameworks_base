@@ -42,4 +42,17 @@
     <string name="battery_level_good_sound" translatable="false">/system/media/audio/ui/GoodBattery.ogg</string>
     <string name="notification_channel_charge_alert">Optimal battery charge level</string>
 
+    <string name="summary_empty" translatable="false"></string>
+
+    <!-- SysUI Tuner -->
+    <string name="statusbar_icons_blacklist">Status bar icons</string>
+    <string name="navbar_tuner_activity">Navigation bar buttons</string>
+    <string name="lockscreen_tuner_activity">Lockscreen shortcuts</string>
+    <string name="powernotif_tuner_activity">Power notifications</string>
+
+    <string name="lockscreen_default">Default</string>
+    <string name="lockscreen_hidden">None</string>
+
+    <!-- Shows when people have clicked on the custom lockscreen shortcut [CHAR LIMIT=60] -->
+    <string name="custom_hint">Swipe from icon to launch</string>
 </resources>

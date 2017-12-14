@@ -25,6 +25,7 @@ import android.app.ActivityManager;
 import android.app.Fragment;
 import android.app.StatusBarManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -37,6 +38,7 @@ import android.util.AttributeSet;
 import android.util.FloatProperty;
 import android.util.MathUtils;
 import android.view.LayoutInflater;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -48,6 +50,7 @@ import android.widget.FrameLayout;
 
 import com.android.internal.logging.MetricsLogger;
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.abc.AbcUtils;
 import com.android.keyguard.KeyguardStatusView;
 import com.android.systemui.DejankUtils;
 import com.android.systemui.Interpolators;
@@ -183,6 +186,8 @@ public class NotificationPanelView extends PanelView implements
     private boolean mQsExpandImmediate;
     private boolean mTwoFingerQsExpandPossible;
 
+    private boolean mOneFingerQuickSettingsIntercept;
+
     /**
      * If we are in a panel collapsing motion, we reset scrollY of our scroll view but still
      * need to take this into account in our panel height calculation.
@@ -240,11 +245,22 @@ public class NotificationPanelView extends PanelView implements
     private StatusBarKeyguardViewManager mStatusBarKeyguardViewManager;
     private boolean mUserSetupComplete;
 
+    private GestureDetector mLockscreenDoubleTapToSleep;
+    private boolean mIsLockscreenDoubleTapEnabled;
+
     public NotificationPanelView(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(!DEBUG);
         mFalsingManager = FalsingManager.getInstance(context);
         mPowerManager = context.getSystemService(PowerManager.class);
+        mLockscreenDoubleTapToSleep = new GestureDetector(context,
+                new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                AbcUtils.switchScreenOff(context);
+                return true;
+            }
+        });
     }
 
     public void setStatusBar(StatusBar bar) {
@@ -831,6 +847,10 @@ public class NotificationPanelView extends PanelView implements
         if (mBlockTouches || (mQs != null && mQs.isCustomizing())) {
             return false;
         }
+        if (mIsLockscreenDoubleTapEnabled
+                && mStatusBarState == StatusBarState.KEYGUARD) {
+            mLockscreenDoubleTapToSleep.onTouchEvent(event);
+        }
         initDownStates(event);
         if (mListenForHeadsUp && !mHeadsUpTouchHelper.isTrackingHeadsUp()
                 && mHeadsUpTouchHelper.onInterceptTouchEvent(event)) {
@@ -859,6 +879,10 @@ public class NotificationPanelView extends PanelView implements
         }
         handled |= super.onTouchEvent(event);
         return mDozing ? handled : true;
+    }
+
+    public void setLockscreenDoubleTapToSleep(boolean isDoubleTapEnabled) {
+        mIsLockscreenDoubleTapEnabled = isDoubleTapEnabled;
     }
 
     private boolean handleQsTouch(MotionEvent event) {
@@ -926,7 +950,18 @@ public class NotificationPanelView extends PanelView implements
                 && (event.isButtonPressed(MotionEvent.BUTTON_SECONDARY)
                         || event.isButtonPressed(MotionEvent.BUTTON_TERTIARY));
 
-        return twoFingerDrag || stylusButtonClickDrag || mouseButtonClickDrag;
+
+        final float w = getMeasuredWidth();
+        final float x = event.getX();
+        float region = w * 1.f / 3.f; // TODO overlay region fraction?
+        boolean showQsOverride = false;
+
+        if (mOneFingerQuickSettingsIntercept) {
+                showQsOverride = isLayoutRtl() ? x < region : w - region < x;
+        }
+        showQsOverride &= mStatusBarState == StatusBarState.SHADE;
+
+        return showQsOverride || twoFingerDrag || stylusButtonClickDrag || mouseButtonClickDrag;
     }
 
     private void handleQsDown(MotionEvent event) {
@@ -2041,12 +2076,20 @@ public class NotificationPanelView extends PanelView implements
         });
         rightIcon = getLayoutDirection() == LAYOUT_DIRECTION_RTL ? !rightIcon : rightIcon;
         if (rightIcon) {
-            mStatusBar.onCameraHintStarted();
+            Intent intent = mKeyguardBottomArea.getRightIntent();
+            if (intent == KeyguardBottomAreaView.INSECURE_CAMERA_INTENT
+                    || intent == KeyguardBottomAreaView.SECURE_CAMERA_INTENT) {
+                mStatusBar.onCameraHintStarted();
+            } else {
+                mStatusBar.onCustomHintStarted();
+            }
         } else {
             if (mKeyguardBottomArea.isLeftVoiceAssist()) {
                 mStatusBar.onVoiceAssistHintStarted();
-            } else {
+            } else if (mKeyguardBottomArea.getLeftIntent() == KeyguardBottomAreaView.PHONE_INTENT) {
                 mStatusBar.onPhoneHintStarted();
+            } else {
+                mStatusBar.onCustomHintStarted();
             }
         }
     }
@@ -2453,7 +2496,8 @@ public class NotificationPanelView extends PanelView implements
         // If we are launching it when we are occluded already we don't want it to animate,
         // nor setting these flags, since the occluded state doesn't change anymore, hence it's
         // never reset.
-        if (!isFullyCollapsed()) {
+        if (!isFullyCollapsed() && mLastCameraLaunchSource ==
+                KeyguardBottomAreaView.CAMERA_LAUNCH_SOURCE_AFFORDANCE) {
             mLaunchingAffordance = true;
             setLaunchingAffordance(true);
         } else {
@@ -2508,12 +2552,12 @@ public class NotificationPanelView extends PanelView implements
      *
      * @param keyguardIsShowing whether keyguard is being shown
      */
-    public boolean canCameraGestureBeLaunched(boolean keyguardIsShowing) {
+    public boolean canCameraGestureBeLaunched(boolean keyguardIsShowing, int source) {
         if (!mStatusBar.isCameraAllowedByAdmin()) {
             return false;
         }
 
-        ResolveInfo resolveInfo = mKeyguardBottomArea.resolveCameraIntent();
+        ResolveInfo resolveInfo = mKeyguardBottomArea.resolveCameraIntent(source);
         String packageToLaunch = (resolveInfo == null || resolveInfo.activityInfo == null)
                 ? null : resolveInfo.activityInfo.packageName;
         return packageToLaunch != null &&
@@ -2657,5 +2701,9 @@ public class NotificationPanelView extends PanelView implements
 
     public LockIcon getLockIcon() {
         return mKeyguardBottomArea.getLockIcon();
+    }
+
+    public void setQsQuickPulldown(boolean isQsQuickPulldown) {
+        mOneFingerQuickSettingsIntercept = isQsQuickPulldown;
     }
 }
