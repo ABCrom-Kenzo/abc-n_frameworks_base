@@ -1,14 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!-- drawable/delete.xml -->
-<vector xmlns:api24="http://schemas.android.com/apk/res/android" xmlns:android="http://schemas.android.com/apk/res/android"
-		android:viewportWidth="512"
-		android:viewportHeight="512"
-		android:height="24dp"
-		android:width="24dp">
-    <path
-        android:pathData="M64.666 182L88.583 471.072C90.707 494.407 109.97 512 133.393 512l245.215 0c23.423 0 42.686 -17.593 44.824 -41.06L447.336 182 64.666 182ZM181 407c0 8.291 -6.709 15 -15 15 -8.291 0 -15 -6.709 -15 -15l0 -180c0 -8.291 6.709 -15 15 -15 8.291 0 15 6.709 15 15l0 180zm90 0c0 8.291 -6.709 15 -15 15 -8.291 0 -15 -6.709 -15 -15l0 -180c0 -8.291 6.709 -15 15 -15 8.291 0 15 6.709 15 15l0 180zm90 0c0 8.291 -6.709 15 -15 15 -8.291 0 -15 -6.709 -15 -15l0 -180c0 -8.291 6.709 -15 15 -15 8.291 0 15 6.709 15 15l0 180z"
-        android:fillColor="#ffffff" />
-    <path
-        android:pathData="M436 60l-105 0 0 -15C331 20.186 310.814 0 286 0l-60 0c-24.814 0 -45 20.186 -45 45l0 15 -105 0C51.186 60 31 80.186 31 105l0 30c0 8.291 6.709 15 15 15 17.772 0 411.904 0 420 0 8.291 0 15 -6.709 15 -15l0 -30C481 80.186 460.814 60 436 60Zm-135 0l-90 0 0 -15c0 -8.276 6.724 -15 15 -15l60 0c8.276 0 15 6.724 15 15l0 15z"
-        android:fillColor="#ffffff" />
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="24dp"
+    android:width="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:fillColor="#ffffff" android:pathData="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
 </vector>
