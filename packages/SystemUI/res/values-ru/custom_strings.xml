@@ -16,6 +16,10 @@
  -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- HW Keys Tile -->
+    <string name="accessibility_quick_settings_hwkeys_on">Кнопки вкл.</string>
+    <string name="accessibility_quick_settings_hwkeys_off">Кнопки выкл.</string>
+    <string name="quick_settings_hwkeys_label">Аппарат. кнопки</string>
     <string name="global_action_restart_advanced">Расшир. перезагрузка</string>
     <string name="global_action_restart_recovery">Режим восстановления</string>
     <string name="global_action_restart_bootloader">Загрузчик</string>
