@@ -100,11 +100,13 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
     protected int mClockStyle = STYLE_CLOCK_RIGHT;
     protected String mClockDateFormat = null;
     protected int mClockDatePosition;
-    protected boolean mShowClock;
+    protected boolean mShowClock = true;
     private int mAmPmStyle;
     private final boolean mShowDark;
     private boolean mShowSeconds;
     private Handler mSecondsHandler;
+
+    private boolean mQuickStatusBarHeader;
 
     public Clock(Context context) {
         this(context, null);
@@ -126,6 +128,7 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
         } finally {
             a.recycle();
         }
+        updateSettings();
     }
 
     @Override
@@ -191,7 +194,8 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
                     if (!newLocale.equals(mLocale)) {
                         mLocale = newLocale;
                     }
-                    updateSettings();
+                    updateClockVisibility();
+                    updateStatus();
                     return;
                 });
             }
@@ -327,7 +331,7 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
         String timeResult = sdf.format(mCalendar.getTime());
         String dateResult = "";
 
-        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_GONE) {
+        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_GONE && !mQuickStatusBarHeader) {
             Date now = new Date();
 
             if (mClockDateFormat == null || mClockDateFormat.isEmpty()) {
@@ -353,6 +357,24 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
 
         SpannableStringBuilder formatted = new SpannableStringBuilder(result);
 
+        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_NORMAL) {
+            if (dateString != null) {
+                int dateStringLen = dateString.length();
+                int timeStringOffset = (mClockDatePosition == STYLE_DATE_RIGHT)
+                        ? timeResult.length() + 1 : 0;
+                if (mClockDateDisplay == CLOCK_DATE_DISPLAY_GONE || mQuickStatusBarHeader) {
+                    formatted.delete(0, dateStringLen);
+                } else {
+                    if (mClockDateDisplay == CLOCK_DATE_DISPLAY_SMALL) {
+                        CharacterStyle style = new RelativeSizeSpan(0.7f);
+                        formatted.setSpan(style, timeStringOffset,
+                                timeStringOffset + dateStringLen,
+                                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+                    }
+                }
+            }
+        }
+
         if (mAmPmStyle != AM_PM_STYLE_NORMAL) {
             int magic1 = result.indexOf(MAGIC1);
             int magic2 = result.indexOf(MAGIC2);
@@ -367,23 +389,6 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
                     }
                     formatted.delete(magic2, magic2 + 1);
                     formatted.delete(magic1, magic1 + 1);
-                }
-            }
-        }
-        if (mClockDateDisplay != CLOCK_DATE_DISPLAY_NORMAL) {
-            if (dateString != null) {
-                int dateStringLen = dateString.length();
-                int timeStringOffset = (mClockDatePosition == STYLE_DATE_RIGHT)
-                        ? timeResult.length() + 1 : 0;
-                if (mClockDateDisplay == CLOCK_DATE_DISPLAY_GONE) {
-                    formatted.delete(0, dateStringLen);
-                } else {
-                    if (mClockDateDisplay == CLOCK_DATE_DISPLAY_SMALL) {
-                        CharacterStyle style = new RelativeSizeSpan(0.7f);
-                        formatted.setSpan(style, timeStringOffset,
-                                timeStringOffset + dateStringLen,
-                                Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-                    }
                 }
             }
         }
@@ -497,4 +502,8 @@ public class Clock extends TextView implements DemoMode, CommandQueue.Callbacks,
             mSecondsHandler.postAtTime(this, SystemClock.uptimeMillis() / 1000 * 1000 + 1000);
         }
     };
+
+    public void setIsQshb(boolean qshb) {
+        mQuickStatusBarHeader = qshb;
+    }
 }

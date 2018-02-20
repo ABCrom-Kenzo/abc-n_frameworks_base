@@ -4252,6 +4252,13 @@ public final class Settings {
         public static final String NOTIFICATION_SOUND_VIB_SCREEN_ON = "notification_sound_vib_screen_on";
 
         /**
+         * Select various accents to go along with system themes
+         *
+         * @hide
+         */
+        public static final String ACCENT_PICKER = "accent_picker";
+
+        /**
          * 0 - fullscreen
          * 1 - partial
          * @hide
@@ -4267,8 +4274,6 @@ public final class Settings {
          * @hide
          */
         public static final String FORCE_AMBIENT_FOR_MEDIA = "force_ambient_for_media";
-
-        /** End of ABC system settings**/
 
         /**
          * @hide
@@ -4363,6 +4368,14 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_CLOCK_DATE_POSITION = "statusbar_clock_date_position";
+
+        /**
+         * Whether to gently vibrate instead of playin a sound when in-call and a notification is pushed
+         * @hide
+         */
+        public static final String INCALL_NOTIFICATIONS_VIBRATE = "incall_notifications_vibrate";
+
+        /** End of ABC system settings**/
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings
